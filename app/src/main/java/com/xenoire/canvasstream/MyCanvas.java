@@ -51,7 +51,6 @@ public class MyCanvas extends View{
                 canvas.drawPath(s.getPath(), s.getPaint());
             }
         }
-        System.out.println("Git Change");
     }
 
     @Override
