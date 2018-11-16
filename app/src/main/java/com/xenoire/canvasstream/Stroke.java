@@ -4,45 +4,51 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Point;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /*
 Class ini tujuannya untuk menampung path. Jadi 1 canvas bisa punya path yang berbeda
 dengan attribute yang berbeda pula.
  */
 public class Stroke {
 
-    private Path path;
-    private Paint paint;
+    private List<Point> points = new ArrayList<Point>();
+    private int color;
+    int strokeWidth;
 
-    public Stroke(Paint paint) {
-        this.paint = paint;
+
+    public Stroke(){};
+
+    public Stroke(int color, int strokeWidth) {
+
+        this.color = color;
+        this.strokeWidth = strokeWidth;
+
     }
 
-    public Path getPath() {
-        return path;
+    public  void  addPoint(int x, int y){
+        Point p = new Point(x, y);
+        points.add(p);
     }
 
-    public void setPath(Path path) {
-        this.path = path;
+    public List<Point> getPoints(){
+        return points;
     }
 
-    public Paint getPaint() {
-        return paint;
+    public int getStrokeWidth() {
+        return strokeWidth;
     }
 
-    public void setPaint(Paint paint) {
-        this.paint = paint;
+    public void setStrokeWidth(int strokeWidth) {
+        this.strokeWidth = strokeWidth;
     }
 
-    public void drawPath(float x, float y){
-        if(path == null){
-            path = new Path();
-            path.moveTo(x, y);
-        } else {
-            path.lineTo(x, y);
-        }
+    public int getColor() {
+        return color;
     }
 
-    public void setColor(int color){
-        paint.setColor(color);
+    public void setColor(int color) {
+        this.color = color;
     }
 }
