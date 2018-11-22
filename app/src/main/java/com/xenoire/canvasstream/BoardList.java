@@ -2,6 +2,7 @@ package com.xenoire.canvasstream;
 
 import android.content.Intent;
 import android.database.DataSetObserver;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -15,12 +16,16 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
+import com.xenoire.canvasstream.DrawActivity;
+import com.xenoire.canvasstream.FirebaseListAdapter;
+import com.xenoire.canvasstream.RegisterActivity;
 
 import java.io.ObjectStreamException;
 import java.util.ArrayList;
@@ -37,6 +42,9 @@ public class BoardList extends AppCompatActivity {
 
     DatabaseReference mRef, mBoardsRef, mSegmentRef;
 
+    private FirebaseAuth mAuth;
+    private FirebaseAuth.AuthStateListener mAuthListener;
+
     private ValueEventListener mConnectedListener;
     private FirebaseListAdapter<HashMap> mBoardListAdapter;
 
@@ -44,6 +52,18 @@ public class BoardList extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_board_list);
+
+        mAuth = FirebaseAuth.getInstance();
+        mAuthListener = new FirebaseAuth.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                if (firebaseAuth.getCurrentUser() == null){
+                    Intent loginIntent = new Intent(BoardList.this, RegisterActivity.class);
+                    loginIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    startActivity(loginIntent);
+                }
+            }
+        };
 
         setTitle("Board List");
         mRef = FirebaseDatabase.getInstance().getReference();
@@ -62,6 +82,9 @@ public class BoardList extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
+
+        mAuth.addAuthStateListener(mAuthListener);
+
         mConnectedListener = FirebaseDatabase.getInstance().getReference(".info/connected").addValueEventListener(
                 new ValueEventListener() {
                     @Override
