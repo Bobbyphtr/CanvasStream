@@ -1,5 +1,6 @@
 package com.xenoire.canvasstream;
 
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -68,10 +69,11 @@ public class RegisterActivity extends AppCompatActivity {
                     if (task.isSuccessful()) {
                         String user_id = mAuth.getCurrentUser().getUid();
                         DatabaseReference current_user_db = mDatabase.child(user_id);
-                        current_user_db.child("name").setValue(nameField.getText());
+                        current_user_db.child("name").setValue(nameField.getText().toString());
                         current_user_db.child("board");
-
+                        Log.i("CLICKED", "is successs");
                     }
+
                 }
             });
 

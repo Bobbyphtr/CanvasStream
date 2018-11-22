@@ -172,6 +172,9 @@ public class BoardList extends AppCompatActivity {
         switch (item.getItemId()){
             case R.id.item_add:
                 createBoard();
+
+            case R.id.logout:
+                mAuth.signOut();
         }
 
         return super.onOptionsItemSelected(item);
