@@ -31,6 +31,7 @@ import java.io.ObjectStreamException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 
 
@@ -38,9 +39,9 @@ public class BoardList extends AppCompatActivity {
 
     ListView listView;
     ArrayAdapter<String> adapter;
-    ArrayList<String> datas = new ArrayList<>();
+    List<String> boardids;
 
-    DatabaseReference mRef, mBoardsRef, mSegmentRef;
+    DatabaseReference mRef, mBoardsRef, mSegmentRef, mUserBoardRef;
 
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
@@ -58,7 +59,7 @@ public class BoardList extends AppCompatActivity {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                 if (firebaseAuth.getCurrentUser() == null){
-                    Intent loginIntent = new Intent(BoardList.this, RegisterActivity.class);
+                    Intent loginIntent = new Intent(BoardList.this, LoginActivity.class);
                     loginIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     startActivity(loginIntent);
                 }
@@ -70,7 +71,9 @@ public class BoardList extends AppCompatActivity {
         mBoardsRef = mRef.child("boardmetas");
         mBoardsRef.keepSynced(true);
         mSegmentRef = mRef.child("boardsSegments");
-
+        if(mAuth.getUid() != null){
+            mUserBoardRef = mRef.child("Users").child(mAuth.getUid()).child("Boards");
+        }
 
 //        mRef.child("First Child");
 //        DatabaseReference childRef = FirebaseDatabase.getInstance().getReference("First Child").child("SecondChild");
@@ -151,6 +154,8 @@ public class BoardList extends AppCompatActivity {
                 }
             }
         });
+        DatabaseReference userBoard  = mUserBoardRef.push();
+        userBoard.setValue(newBoardRef.getKey());
     }
 
 
