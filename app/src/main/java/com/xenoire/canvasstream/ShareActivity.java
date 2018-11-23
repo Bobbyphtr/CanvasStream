@@ -18,6 +18,7 @@ public class ShareActivity extends AppCompatActivity {
     Button btnShare;
     DatabaseReference boardRef;
     String sharedUserId;
+    String boardShared;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,7 +29,7 @@ public class ShareActivity extends AppCompatActivity {
 
         Intent shareIntent = getIntent();
         if(shareIntent.getExtras()!=null) {
-            shareIntent.getIntExtra("",0);
+            boardShared = shareIntent.getStringExtra("Board");
         }
 
         btnShare.setOnClickListener(new View.OnClickListener() {
@@ -37,7 +38,7 @@ public class ShareActivity extends AppCompatActivity {
                 if(!userField.getText().toString().equalsIgnoreCase("")) {
                     sharedUserId = userField.getText().toString();
                     boardRef = FirebaseDatabase.getInstance().getReference("Users").child(sharedUserId).child("board");
-                    boardRef.push().setValue("Tes");//Isi value diganti board-board yang dimiliki user yang sedang login
+                    boardRef.push().setValue(boardShared);//Isi value diganti board-board yang dimiliki user yang sedang login
                     userField.setText("");
                     Toast.makeText(ShareActivity.this,"Boards Successfully Shared!",Toast.LENGTH_SHORT).show();
                 }
