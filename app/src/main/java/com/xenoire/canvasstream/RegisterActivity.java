@@ -72,7 +72,6 @@ public class RegisterActivity extends AppCompatActivity {
                         current_user_db.child("name").setValue(nameField.getText().toString());
                         current_user_db.child("board");
                         Log.i("CLICKED", "is successs");
-
                         Intent main = new Intent(RegisterActivity.this,BoardList.class);
                         main.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                         startActivity(main);
