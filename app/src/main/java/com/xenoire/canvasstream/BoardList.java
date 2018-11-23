@@ -1,12 +1,14 @@
 package com.xenoire.canvasstream;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.DataSetObserver;
 import android.graphics.Point;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
+import android.text.InputType;
 import android.view.ContextMenu;
 import android.view.Display;
 import android.view.Menu;
@@ -14,6 +16,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -56,39 +59,35 @@ public class BoardList extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_board_list);
 
-//        mAuth = FirebaseAuth.getInstance();
-//        mAuthListener = new FirebaseAuth.AuthStateListener() {
-//            @Override
-//            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-//                if (firebaseAuth.getCurrentUser() == null){
-//                    Intent loginIntent = new Intent(BoardList.this, RegisterActivity.class);
-//                    loginIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-//                    startActivity(loginIntent);
-//                }
-//            }
-//        };
+        mAuth = FirebaseAuth.getInstance();
+        mAuthListener = new FirebaseAuth.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                if (firebaseAuth.getCurrentUser() == null){
+                    Intent loginIntent = new Intent(BoardList.this, LoginActivity.class);
+                    loginIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    startActivity(loginIntent);
+                    finish();
+
+                }
+            }
+        };
 
         setTitle("Board List");
         mRef = FirebaseDatabase.getInstance().getReference();
         mBoardsRef = mRef.child("boardmetas");
         mBoardsRef.keepSynced(true);
         mSegmentRef = mRef.child("boardsSegments");
-//        if(mAuth.getUid() != null){
-//            mUserBoardRef = mRef.child("Users").child(mAuth.getUid()).child("Boards");
-//        }
-
-//        mRef.child("First Child");
-//        DatabaseReference childRef = FirebaseDatabase.getInstance().getReference("First Child").child("SecondChild");
-//        DatabaseReference valueRef = childRef.child("value");
-//        valueRef.push();
-//        valueRef.setValue("wat wat");
+        if(mAuth.getUid() != null){
+            mUserBoardRef = mRef.child("Users").child(mAuth.getUid()).child("Boards");
+        }
     }
 
     @Override
     protected void onStart() {
         super.onStart();
 
-        //mAuth.addAuthStateListener(mAuthListener);
+        mAuth.addAuthStateListener(mAuthListener);
 
         mConnectedListener = FirebaseDatabase.getInstance().getReference(".info/connected").addValueEventListener(
                 new ValueEventListener() {
@@ -114,8 +113,21 @@ public class BoardList extends AppCompatActivity {
         mBoardListAdapter = new FirebaseListAdapter<HashMap>(mBoardsRef, HashMap.class, R.layout.board_element, this) {
             @Override
             protected void populateView(View v, HashMap model) {
+                final View view = v;
                 final String key = BoardList.this.mBoardListAdapter.getModelKey(model);
-                ((TextView) v.findViewById(R.id.board_title)).setText(key);
+                mBoardsRef.child(key).addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        Map<String, Object> boardValues = (Map<String, Object>) dataSnapshot.getValue();
+                        ((TextView) view.findViewById(R.id.board_title)).setText((String) boardValues.get("boardName"));
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
+
             }
         };
 
@@ -137,38 +149,68 @@ public class BoardList extends AppCompatActivity {
 
     private void createBoard() {
         // create a new board
-        final DatabaseReference newBoardRef = mBoardsRef.push();
-        Map<String, Object> newBoardValues = new HashMap<>();
-        newBoardValues.put("createdAt", ServerValue.TIMESTAMP);
-        Display display = getWindowManager().getDefaultDisplay();
-        Point size = new Point();
-        display.getSize(size);
-        newBoardValues.put("width", size.x + 125);
-        newBoardValues.put("height", size.y);
-        newBoardRef.setValue(newBoardValues, new DatabaseReference.CompletionListener() {
+
+        final String[] name = {""};
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Board Name");
+
+        // Set up the input
+        final EditText input = new EditText(this);
+        // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
+        input.setInputType(InputType.TYPE_CLASS_TEXT);
+        builder.setView(input);
+
+        // Set up the buttons
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             @Override
-            public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
-                if (databaseError != null) {
-                    System.out.println(databaseError.toString());
-                    throw databaseError.toException();
-                } else {
-                    // once the board is created, start a DrawingActivity on it
-                    openBoard(newBoardRef.getKey());
-                }
+            public void onClick(DialogInterface dialog, int which) {
+                name[0] = input.getText().toString();
+                final DatabaseReference newBoardRef = mBoardsRef.push();
+                Map<String, Object> newBoardValues = new HashMap<>();
+                newBoardValues.put("createdAt", ServerValue.TIMESTAMP);
+                Display display = getWindowManager().getDefaultDisplay();
+                Point size = new Point();
+                display.getSize(size);
+                newBoardValues.put("boardName", name[0]);
+                newBoardValues.put("width", size.x + 125);
+                newBoardValues.put("height", size.y);
+                newBoardRef.setValue(newBoardValues, new DatabaseReference.CompletionListener() {
+                    @Override
+                    public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+                        if (databaseError != null) {
+                            System.out.println(databaseError.toString());
+                            throw databaseError.toException();
+                        } else {
+                            // once the board is created, start a DrawingActivity on it
+                            openBoard(newBoardRef.getKey());
+                        }
+                    }
+                });
+                DatabaseReference userBoard  = mUserBoardRef.push();
+                userBoard.setValue(newBoardRef.getKey());
             }
         });
-//        DatabaseReference userBoard  = mUserBoardRef.push();
-//        userBoard.setValue(newBoardRef.getKey());
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+
+        builder.show();
+
+
     }
 
 
     private void openBoard(String key) {
         System.out.println("Opening Board " + key);
-        Toast.makeText(BoardList.this, "Opening board: "+key, Toast.LENGTH_LONG).show();
+        Toast.makeText(BoardList.this, "Opening board: " + key, Toast.LENGTH_LONG).show();
         Intent intent = new Intent(this, DrawActivity.class);
         intent.putExtra("BOARD_ID", key);
         startActivity(intent);
     }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.action_menu, menu);
@@ -177,12 +219,14 @@ public class BoardList extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()){
+        switch (item.getItemId()) {
             case R.id.item_add:
                 createBoard();
+                break;
 
-//            case R.id.logout:
-//                mAuth.signOut();
+            case R.id.logout:
+                mAuth.signOut();
+                break;
         }
 
         return super.onOptionsItemSelected(item);

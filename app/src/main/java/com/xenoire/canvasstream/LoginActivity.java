@@ -8,6 +8,7 @@ import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -18,6 +19,8 @@ import com.google.firebase.auth.FirebaseAuth;
 public class LoginActivity extends AppCompatActivity {
 
     private EditText emailField, passwordField;
+
+    private TextView textRegister;
 
     private Button loginButton;
 
@@ -42,6 +45,15 @@ public class LoginActivity extends AppCompatActivity {
                 checkLogin();
             }
         });
+        textRegister = findViewById(R.id.textRegister);
+        textRegister.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent registerIntent = new Intent(LoginActivity.this,RegisterActivity.class);
+                registerIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(registerIntent);
+            }
+        });
 
 
     }
@@ -60,6 +72,7 @@ public class LoginActivity extends AppCompatActivity {
                         Intent main = new Intent(LoginActivity.this ,BoardList.class);
                         main.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                         startActivity(main);
+                        finish();
 
                     }else {
                         Toast.makeText(LoginActivity.this,"ERROR LOGIN", Toast.LENGTH_LONG).show();

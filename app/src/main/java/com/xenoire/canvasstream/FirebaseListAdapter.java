@@ -18,7 +18,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public abstract class FirebaseListAdapter<T> extends BaseAdapter {
+public abstract class
+FirebaseListAdapter<T> extends BaseAdapter {
 
 
     private Query mRef;
