@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/item_color"
+        android:title="Color" >
+        <menu>
+            <item
+                android:id="@+id/item_red"
+                android:icon="@drawable/ic_action_red"
+                android:title="Color : Red" />
+            <item
+                android:id="@+id/item_black"
+                android:icon="@drawable/ic_action_black"
+                android:title="Color : Black" />
+            <item
+                android:id="@+id/item_green"
+                android:icon="@drawable/ic_action_green"
+                android:title="Color : Green" />
+            <item
+                android:id="@+id/item_blue"
+                android:icon="@drawable/ic_action_blue"
+                android:title="Color : Blue" />
+        </menu>
+    </item>
+    <item
+        android:id="@+id/item_stroke"
+        android:title="Stroke" >
+        <menu >
+            <item
+                android:id="@+id/item_stroke_10"
+                android:title="10 pt" />
+            <item
+                android:id="@+id/item_stroke_15"
+                android:title="15 pt" />
+            <item
+                android:id="@+id/item_stroke_20"
+                android:title="20 pt" />
+            <item
+                android:id="@+id/item_stroke_25"
+                android:title="25 pt" />
+        </menu>
+    </item>
+    <item
+        android:id="@+id/item_clearAll"
+        android:title="Clear All"></item>
+    <item
+        android:id="@+id/item_share"
+        android:title="Share" ></item>
+</menu>

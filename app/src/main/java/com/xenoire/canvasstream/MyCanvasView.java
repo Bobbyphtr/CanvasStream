@@ -40,14 +40,18 @@ public class MyCanvasView extends View{
     private int mCanvasWidth;
     private int mCanvasHeight;
 
-    private int strokeWidth;
-    private int colorNow = Color.BLACK;
+    private int strokeWidth = 31;
+    private int colorNow = Color.RED;
 
     private final int DEFAULT_COLOR = Color.BLACK;
     private final int DEFAULT_BG_COLOR = Color.GRAY;
-    private final int DEFAULT_STROKE_WIDTH = 120;
+    private final int DEFAULT_STROKE_WIDTH = 10;
     private static final float TOUCH_TOLERANCE = 4;
     private static final int PIXEL_SIZE = 8;
+
+    public MyCanvasView(Context context, @Nullable AttributeSet attrs) {
+        super(context, attrs);
+    }
 
     public MyCanvasView(Context context, DatabaseReference ref) {
         this(context, null, ref, 1.0f);
@@ -79,9 +83,9 @@ public class MyCanvasView extends View{
                 if(!mOutstandingStrokes.contains(name)){
                     Stroke stroke = dataSnapshot.getValue(Stroke.class);
                     drawStroke(stroke, paintFromColor(stroke.getColor()));
-
                     invalidate();
                 }
+
             }
 
             @Override
@@ -91,7 +95,8 @@ public class MyCanvasView extends View{
 
             @Override
             public void onChildRemoved(DataSnapshot dataSnapshot) {
-
+                clearAll();
+                invalidate();
             }
 
             @Override
@@ -108,9 +113,9 @@ public class MyCanvasView extends View{
         mPaint = new Paint();
         mPaint.setAntiAlias(true);
         mPaint.setDither(true);
-        mPaint.setColor(DEFAULT_COLOR);
+        mPaint.setColor(colorNow);
         mPaint.setStyle(Paint.Style.STROKE);
-
+        mPaint.setStrokeWidth(strokeWidth);
         mBitmapPaint = new Paint(Paint.DITHER_FLAG);
 
     }
@@ -130,6 +135,7 @@ public class MyCanvasView extends View{
 
     private void drawStroke(Stroke stroke, Paint p){
         if(mBuffer != null){
+            p.setStrokeWidth(stroke.strokeWidth);
             mBuffer.drawPath(getPathForPoints(stroke.getPoints(), mScale), p);
         }
     }
@@ -160,7 +166,7 @@ public class MyCanvasView extends View{
         super.onSizeChanged(w, h, oldw, oldh);
 
         mScale = Math.min(1.0f * w / mCanvasWidth, 1.0f * h / mCanvasHeight);
-
+        Log.i("AndroidDrawing", "onSizeChanged: w = " + w + " h = " + h+ "mCanvasWidth = " + mCanvasWidth);
         // your Canvas will draw onto the defined Bitmap
         mBitmap = Bitmap.createBitmap(Math.round(mCanvasWidth * mScale),
                 Math.round(mCanvasHeight * mScale),
@@ -177,6 +183,7 @@ public class MyCanvasView extends View{
         mBuffer = new Canvas(mBitmap);
         mCurrentStroke = null;
         mOutstandingStrokes.clear();
+        ref.removeValue();
         invalidate();
     }
 
@@ -195,7 +202,7 @@ public class MyCanvasView extends View{
     private void touchStart(float x, float y) {
         mPath.reset();
         mPath.moveTo(x, y);
-        mCurrentStroke = new Stroke(colorNow, DEFAULT_STROKE_WIDTH);
+        mCurrentStroke = new Stroke(colorNow, strokeWidth);
         mLastX = (int) x / PIXEL_SIZE;
         mLastY = (int) y / PIXEL_SIZE;
         mCurrentStroke.addPoint(mLastX, mLastY);
@@ -227,7 +234,7 @@ public class MyCanvasView extends View{
        mOutstandingStrokes.add(strokeName);
 
         // create a scaled version of the segment, so that it matches the size of the board
-        Stroke stroke = new Stroke(mCurrentStroke.getColor(), DEFAULT_STROKE_WIDTH);
+        Stroke stroke = new Stroke(mCurrentStroke.getColor(), strokeWidth);
         for (Point point : mCurrentStroke.getPoints()){
             stroke.addPoint(Math.round(point.x / mScale), Math.round(point.y / mScale));
         }
@@ -269,6 +276,16 @@ public class MyCanvasView extends View{
 
     public void cleanUp(){
         ref.removeEventListener(mListener);
+    }
+
+    public void setColorNow(int colorNow){
+        this.colorNow = colorNow;
+        this.mPaint.setColor(colorNow);
+    }
+
+    public void setStrokeWidth(int strokeWidth){
+        this.strokeWidth = strokeWidth;
+        mPaint.setStrokeWidth(strokeWidth);
     }
 
 }

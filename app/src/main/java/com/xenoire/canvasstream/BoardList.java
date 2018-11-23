@@ -2,11 +2,13 @@ package com.xenoire.canvasstream;
 
 import android.content.Intent;
 import android.database.DataSetObserver;
+import android.graphics.Point;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.ContextMenu;
+import android.view.Display;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -54,26 +56,26 @@ public class BoardList extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_board_list);
 
-        mAuth = FirebaseAuth.getInstance();
-        mAuthListener = new FirebaseAuth.AuthStateListener() {
-            @Override
-            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                if (firebaseAuth.getCurrentUser() == null){
-                    Intent loginIntent = new Intent(BoardList.this, LoginActivity.class);
-                    loginIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    startActivity(loginIntent);
-                }
-            }
-        };
+//        mAuth = FirebaseAuth.getInstance();
+//        mAuthListener = new FirebaseAuth.AuthStateListener() {
+//            @Override
+//            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+//                if (firebaseAuth.getCurrentUser() == null){
+//                    Intent loginIntent = new Intent(BoardList.this, RegisterActivity.class);
+//                    loginIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+//                    startActivity(loginIntent);
+//                }
+//            }
+//        };
 
         setTitle("Board List");
         mRef = FirebaseDatabase.getInstance().getReference();
         mBoardsRef = mRef.child("boardmetas");
         mBoardsRef.keepSynced(true);
         mSegmentRef = mRef.child("boardsSegments");
-        if(mAuth.getUid() != null){
-            mUserBoardRef = mRef.child("Users").child(mAuth.getUid()).child("Boards");
-        }
+//        if(mAuth.getUid() != null){
+//            mUserBoardRef = mRef.child("Users").child(mAuth.getUid()).child("Boards");
+//        }
 
 //        mRef.child("First Child");
 //        DatabaseReference childRef = FirebaseDatabase.getInstance().getReference("First Child").child("SecondChild");
@@ -86,7 +88,7 @@ public class BoardList extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
 
-        mAuth.addAuthStateListener(mAuthListener);
+        //mAuth.addAuthStateListener(mAuthListener);
 
         mConnectedListener = FirebaseDatabase.getInstance().getReference(".info/connected").addValueEventListener(
                 new ValueEventListener() {
@@ -138,9 +140,10 @@ public class BoardList extends AppCompatActivity {
         final DatabaseReference newBoardRef = mBoardsRef.push();
         Map<String, Object> newBoardValues = new HashMap<>();
         newBoardValues.put("createdAt", ServerValue.TIMESTAMP);
-        android.graphics.Point size = new android.graphics.Point();
-        getWindowManager().getDefaultDisplay().getSize(size);
-        newBoardValues.put("width", size.x);
+        Display display = getWindowManager().getDefaultDisplay();
+        Point size = new Point();
+        display.getSize(size);
+        newBoardValues.put("width", size.x + 125);
         newBoardValues.put("height", size.y);
         newBoardRef.setValue(newBoardValues, new DatabaseReference.CompletionListener() {
             @Override
@@ -154,8 +157,8 @@ public class BoardList extends AppCompatActivity {
                 }
             }
         });
-        DatabaseReference userBoard  = mUserBoardRef.push();
-        userBoard.setValue(newBoardRef.getKey());
+//        DatabaseReference userBoard  = mUserBoardRef.push();
+//        userBoard.setValue(newBoardRef.getKey());
     }
 
 
@@ -178,8 +181,8 @@ public class BoardList extends AppCompatActivity {
             case R.id.item_add:
                 createBoard();
 
-            case R.id.logout:
-                mAuth.signOut();
+//            case R.id.logout:
+//                mAuth.signOut();
         }
 
         return super.onOptionsItemSelected(item);
