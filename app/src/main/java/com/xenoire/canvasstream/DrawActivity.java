@@ -17,7 +17,6 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.wangjie.rapidfloatingactionbutton.rfabgroup.RapidFloatingActionButtonGroup;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,13 +32,9 @@ public class DrawActivity extends AppCompatActivity{
 
     int mBoardWidth, mBoardHeight;
 
-    private RapidFloatingActionButtonGroup rfabGroup;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        rfabGroup = findViewById(R.id.rfab_group_sample_rfabg);
 //        rfabGroup.setOnRapidFloatingButtonGroupListener(new OnRapidFloatingButtonGroupListener() {
 //            @Override
 //            public void onRFABGPrepared(RapidFloatingActionButtonGroup rapidFloatingActionButtonGroup) {
@@ -171,7 +166,7 @@ public class DrawActivity extends AppCompatActivity{
 
             case R.id.item_share:
                 Intent shareIntent = new Intent(DrawActivity.this,ShareActivity.class);
-                shareIntent.putExtra("",0);
+                shareIntent.putExtra("Board",getIntent().getStringExtra("BOARD_ID"));
                 startActivity(shareIntent);
                 break;
         }
