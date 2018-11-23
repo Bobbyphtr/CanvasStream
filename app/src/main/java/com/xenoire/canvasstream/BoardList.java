@@ -108,9 +108,9 @@ public class BoardList extends AppCompatActivity {
                     }
                 }
         );
-
+        
         final ListView boardList = (ListView) this.findViewById(R.id.boardList);
-        mBoardListAdapter = new FirebaseListAdapter<HashMap>(mBoardsRef, HashMap.class, R.layout.board_element, this) {
+        mBoardListAdapter = new FirebaseListAdapter<HashMap>(mBoardsRef, HashMap.class, R.layout.board_element, this, mAuth.getUid()) {
             @Override
             protected void populateView(View v, HashMap model) {
                 final View view = v;

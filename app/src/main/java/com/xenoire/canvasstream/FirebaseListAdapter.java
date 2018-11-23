@@ -30,7 +30,7 @@ FirebaseListAdapter<T> extends BaseAdapter {
     private Map<String, T> mModelKeys;
     private ChildEventListener mListener;
 
-    public FirebaseListAdapter(DatabaseReference mRef, Class<T> mModelClass, int mLayout, Activity activity) {
+    public FirebaseListAdapter(DatabaseReference mRef, Class<T> mModelClass, int mLayout, Activity activity, String userKey) {
 
         this.mRef = mRef;
         this.mModelClass = mModelClass;
@@ -41,7 +41,6 @@ FirebaseListAdapter<T> extends BaseAdapter {
         Log.v("FirebaseListAdapter", "adding child event listeners");
         // Look for all child events. We will then map them to our own internal ArrayList, which backs ListView
         mListener = this.mRef.addChildEventListener(new ChildEventListener() {
-
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String previousChildName) {
                 T model = (T) dataSnapshot.getValue();
@@ -111,7 +110,6 @@ FirebaseListAdapter<T> extends BaseAdapter {
 
 
             @Override
-
             public void onCancelled(DatabaseError databaseError) {
                 Log.e("FirebaseListAdapter", "Listen was cancelled, no more updates will occur");
             }
