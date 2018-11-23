@@ -58,7 +58,7 @@ public class LoginActivity extends AppCompatActivity {
                 startActivity(registerIntent);
             }
         });
-        
+
     }
 
     private void checkLogin() {
