@@ -1,6 +1,7 @@
 package com.xenoire.canvasstream;
 
 import android.animation.AnimatorSet;
+import android.content.Intent;
 import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -135,12 +136,15 @@ public class DrawActivity extends AppCompatActivity{
             case R.id.item_blue:
                 myCanvasView.setColorNow(Color.BLUE);
                 break;
+
             case R.id.item_green :
                 myCanvasView.setColorNow(Color.GREEN);
                 break;
+
             case R.id.item_red:
                 myCanvasView.setColorNow(Color.RED);
                 break;
+
             case R.id.item_black :
                 myCanvasView.setColorNow(Color.BLACK);
                 break;
@@ -148,18 +152,27 @@ public class DrawActivity extends AppCompatActivity{
             case R.id.item_stroke_10:
                 myCanvasView.setStrokeWidth(10);
                 break;
+
             case R.id.item_stroke_15:
                 myCanvasView.setStrokeWidth(15);
                 break;
+
             case R.id.item_stroke_20:
                 myCanvasView.setStrokeWidth(20);
                 break;
+
             case R.id.item_stroke_25:
                 myCanvasView.setStrokeWidth(25);
                 break;
 
             case R.id.item_clearAll:
                 myCanvasView.clearAll();
+                break;
+
+            case R.id.item_share:
+                Intent shareIntent = new Intent(DrawActivity.this,ShareActivity.class);
+                shareIntent.putExtra("",0);
+                startActivity(shareIntent);
                 break;
         }
 
