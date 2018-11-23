@@ -3,6 +3,7 @@ package com.xenoire.canvasstream;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -36,16 +37,24 @@ public class ShareActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if(!userField.getText().toString().equalsIgnoreCase("")) {
-                    sharedUserId = userField.getText().toString();
+                    sharedUserId = swapString(userField.getText().toString());
                     boardRef = FirebaseDatabase.getInstance().getReference("Users").child(sharedUserId).child("board");
-                    boardRef.push().setValue(boardShared);//Isi value diganti board-board yang dimiliki user yang sedang login
+                    boardRef.push().setValue(boardShared);
                     userField.setText("");
                     Toast.makeText(ShareActivity.this,"Boards Successfully Shared!",Toast.LENGTH_SHORT).show();
                 }
                 else {
-                    Toast.makeText(ShareActivity.this,"Input the USER ID!",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ShareActivity.this,"Input the Email Field!",Toast.LENGTH_SHORT).show();
                 }
             }
         });
+
+    }
+    private String swapString(String email){
+        email = email.replace('.', '0');
+        email = email.replace('_', '1');
+        email = email.replace('@', '2');
+        Log.i("SWAP", email);
+        return  email;
     }
 }
