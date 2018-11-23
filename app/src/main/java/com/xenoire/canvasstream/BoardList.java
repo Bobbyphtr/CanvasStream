@@ -80,6 +80,7 @@ public class BoardList extends AppCompatActivity {
         mSegmentRef = mRef.child("boardsSegments");
         if(mAuth.getUid() != null){
             mUserBoardRef = mRef.child("Users").child(mAuth.getUid()).child("Boards");
+
         }
     }
 
