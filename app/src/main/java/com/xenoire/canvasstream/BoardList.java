@@ -9,6 +9,7 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.InputType;
+import android.util.Log;
 import android.view.ContextMenu;
 import android.view.Display;
 import android.view.Menu;
@@ -46,7 +47,7 @@ public class BoardList extends AppCompatActivity {
     ArrayAdapter<String> adapter;
     List<String> boardids;
 
-    DatabaseReference mRef, mBoardsRef, mSegmentRef, mUserBoardRef;
+    DatabaseReference mRef, mBoardsRef, mSegmentRef;
 
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
@@ -75,13 +76,17 @@ public class BoardList extends AppCompatActivity {
 
         setTitle("Board List");
         mRef = FirebaseDatabase.getInstance().getReference();
-        mBoardsRef = mRef.child("boardmetas");
+        mBoardsRef = mRef.child("Users").child(swapString(mAuth.getCurrentUser().getEmail())).child("boardmetas");
         mBoardsRef.keepSynced(true);
         mSegmentRef = mRef.child("boardsSegments");
-        if(mAuth.getUid() != null){
-            mUserBoardRef = mRef.child("Users").child(mAuth.getUid()).child("Boards");
+    }
 
-        }
+    private String swapString(String email){
+        email = email.replace('.', '0');
+        email = email.replace('_', '1');
+        email = email.replace('@', '2');
+        Log.i("SWAP", email);
+        return  email;
     }
 
     @Override
@@ -111,7 +116,7 @@ public class BoardList extends AppCompatActivity {
         );
         
         final ListView boardList = (ListView) this.findViewById(R.id.boardList);
-        mBoardListAdapter = new FirebaseListAdapter<HashMap>(mBoardsRef, HashMap.class, R.layout.board_element, this, mAuth.getUid()) {
+        mBoardListAdapter = new FirebaseListAdapter<HashMap>(mBoardsRef, HashMap.class, R.layout.board_element, this, mAuth) {
             @Override
             protected void populateView(View v, HashMap model) {
                 final View view = v;
@@ -187,8 +192,6 @@ public class BoardList extends AppCompatActivity {
                         }
                     }
                 });
-                DatabaseReference userBoard  = mUserBoardRef.push();
-                userBoard.setValue(newBoardRef.getKey());
             }
         });
         builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -209,6 +212,7 @@ public class BoardList extends AppCompatActivity {
         Toast.makeText(BoardList.this, "Opening board: " + key, Toast.LENGTH_LONG).show();
         Intent intent = new Intent(this, DrawActivity.class);
         intent.putExtra("BOARD_ID", key);
+        intent.putExtra("EMAIL", mAuth.getCurrentUser().getEmail());
         startActivity(intent);
     }
 

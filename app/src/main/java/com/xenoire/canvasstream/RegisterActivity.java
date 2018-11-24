@@ -65,8 +65,8 @@ public class RegisterActivity extends AppCompatActivity {
         if (!TextUtils.isEmpty(name) && !TextUtils.isEmpty(email) && !TextUtils.isEmpty(password)) {
 
             mAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                @Override
-                public void onComplete(@NonNull Task<AuthResult> task) {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
                     if (task.isSuccessful()) {
                         String user_id = mAuth.getCurrentUser().getUid();
                         String email = emailField.getText().toString();
@@ -74,6 +74,7 @@ public class RegisterActivity extends AppCompatActivity {
                         current_user_db.child("id").setValue(user_id);
                         current_user_db.child("nama").setValue(nameField.getText().toString());
                         current_user_db.child("email").setValue(emailField.getText().toString());
+                        //current_user_db.child("boardCount").setValue
                         current_user_db.child("board");
                         Log.i("CLICKED", "is successs");
                         Intent main = new Intent(RegisterActivity.this,BoardList.class);

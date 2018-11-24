@@ -45,9 +45,11 @@ public class DrawActivity extends AppCompatActivity{
 
 
         final String boardId = getIntent().getStringExtra("BOARD_ID");
+        final String email = getIntent().getStringExtra("EMAIL");
+
         Log.i(TAG, "Adding DrawingView for boardId " + boardId);
         mStrokeRef = FirebaseDatabase.getInstance().getReference("boardstrokes").child(boardId);
-        mMetadataRef = FirebaseDatabase.getInstance().getReference("boardmetas").child(boardId);
+        mMetadataRef = FirebaseDatabase.getInstance().getReference().child("Users").child(swapString(email)).child("boardmetas").child(boardId);
         mMetadataRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -75,6 +77,14 @@ public class DrawActivity extends AppCompatActivity{
             }
         });
 
+    }
+
+    private String swapString(String email){
+        email = email.replace('.', '0');
+        email = email.replace('_', '1');
+        email = email.replace('@', '2');
+        Log.i("SWAP", email);
+        return  email;
     }
 
 
@@ -167,6 +177,7 @@ public class DrawActivity extends AppCompatActivity{
             case R.id.item_share:
                 Intent shareIntent = new Intent(DrawActivity.this,ShareActivity.class);
                 shareIntent.putExtra("Board",getIntent().getStringExtra("BOARD_ID"));
+                shareIntent.putExtra("Email", getIntent().getStringExtra("EMAIL"));
                 startActivity(shareIntent);
                 break;
         }

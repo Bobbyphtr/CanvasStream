@@ -7,10 +7,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 
 import java.util.ArrayList;
@@ -29,20 +31,24 @@ FirebaseListAdapter<T> extends BaseAdapter {
     private List<T> mModels;
     private Map<String, T> mModelKeys;
     private ChildEventListener mListener;
+    private FirebaseAuth mAuth;
 
-    public FirebaseListAdapter(DatabaseReference mRef, Class<T> mModelClass, int mLayout, Activity activity, String userKey) {
-
+    public FirebaseListAdapter(DatabaseReference mRef, Class<T> mModelClass, int mLayout, Activity activity, final FirebaseAuth mAuth) {
+        this.mAuth = mAuth;
         this.mRef = mRef;
         this.mModelClass = mModelClass;
         this.mLayout = mLayout;
         mInflater = activity.getLayoutInflater();
         mModels = new ArrayList<T>();
         mModelKeys = new HashMap<String, T>();
+
         Log.v("FirebaseListAdapter", "adding child event listeners");
         // Look for all child events. We will then map them to our own internal ArrayList, which backs ListView
         mListener = this.mRef.addChildEventListener(new ChildEventListener() {
+            
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String previousChildName) {
+
                 T model = (T) dataSnapshot.getValue();
                 mModelKeys.put(dataSnapshot.getKey(), model);
 
@@ -115,6 +121,8 @@ FirebaseListAdapter<T> extends BaseAdapter {
             }
         });
     }
+
+
 
     public void cleanUp() {
         mRef.removeEventListener(mListener);
